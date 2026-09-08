@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraVerify - Verifikasi Tanda Tangan Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Montserrat', sans-serif; }
+        .bg-pattern {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-pattern min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-28 sm:h-32 flex items-center justify-between">
+            <div class="flex items-center space-x-4 sm:space-x-5">
+                <!-- Custom Logo from Google Drive (Enlarged) -->
+                <div class="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-slate-800/80 p-1.5 flex items-center justify-center border border-slate-700/80 overflow-hidden shrink-0 shadow-inner">
+                    <img src="https://lh3.googleusercontent.com/d/1YjBmddwJqYpttC20lBouIDVOyqUSWtkF" 
+                         onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=1YjBmddwJqYpttC20lBouIDVOyqUSWtkF&sz=w500';" 
+                         alt="AuraVerify Logo" 
+                         class="w-full h-full object-contain rounded-xl">
+                </div>
+                <div>
+                    <span class="font-extrabold text-2xl sm:text-3xl tracking-tight block leading-tight text-white">AuraVerify</span>
+                    <span class="text-xs sm:text-sm text-slate-400 block font-medium">Sistem Verifikasi Dokumen</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-3xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- Notification Toast -->
+        <div id="toast" class="hidden fixed bottom-5 right-5 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl z-50 flex items-center space-x-3 border border-slate-700 transition-all duration-300">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+            <span id="toast-message" class="text-sm font-medium">Notifikasi</span>
+        </div>
+
+        <!-- Document Verification Card -->
+        <section id="tab-verify" class="space-y-6">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                
+                <!-- Status Banner -->
+                <div id="verify-status-banner" class="bg-slate-900 text-white p-6 sm:p-8 flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center text-2xl shrink-0">
+                        <i id="status-icon" class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <h2 id="status-title" class="text-xl sm:text-2xl font-extrabold tracking-tight">Dokumen Terverifikasi</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Keaslian dokumen ini telah dikonfirmasi oleh sistem</p>
+                    </div>
+                </div>
+
+                <!-- Document Details -->
+                <div class="p-6 sm:p-8 space-y-6">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 1. Perihal -->
+                        <div class="space-y-1 md:col-span-2">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Perihal</p>
+                            <p id="view-doc-title" class="font-bold text-slate-900 text-lg sm:text-xl leading-snug">Penugasan Produksi Video Musik "Fix You" & Rencana Anggaran Biaya</p>
+                        </div>
+
+                        <!-- 2. Nomor Surat -->
+                        <div class="space-y-1">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nomor Surat</p>
+                            <p id="view-doc-num" class="font-mono font-bold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg inline-block text-sm border border-slate-200">04/ARGR/IX/26</p>
+                        </div>
+
+                        <!-- 3. Tanggal Diterbitkan -->
+                        <div class="space-y-1">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tanggal Diterbitkan</p>
+                            <p id="view-doc-date" class="font-bold text-slate-700 text-base">8 September 2026</p>
+                        </div>
+
+                        <!-- 4. Nama Penyedia -->
+                        <div class="space-y-1 md:col-span-2">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nama Penyedia</p>
+                            <p id="view-doc-org" class="font-bold text-slate-700 text-base">Auraphone Pictures</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100"></div>
+
+                    <!-- 5. Nama Penandatangan & Jabatan + 6. Visual Tanda Tangan -->
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-slate-200 text-slate-700 rounded-xl flex items-center justify-center font-bold text-xl shrink-0 mt-1">
+                                <i class="fa-solid fa-user-pen"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Penandatangan</p>
+                                <h3 id="view-signee-name" class="font-extrabold text-slate-900 text-lg">Azfarazqa Musadad</h3>
+                                <p id="view-signee-role" class="text-xs font-medium text-slate-600 mt-1 leading-relaxed max-w-md">Pemilik, Tim Kreatif, Founder, Director, Editor Griya Surya Indah Studios & Auraphone Pictures</p>
+                            </div>
+                        </div>
+
+                        <!-- Visual Tanda Tangan -->
+                        <div class="text-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto shrink-0 min-w-[200px]">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2">Visual Tanda Tangan</p>
+                            <div id="view-signature-container" class="h-20 flex items-center justify-center p-1">
+                                <img id="view-signature-img" 
+                                     src="https://lh3.googleusercontent.com/d/1tma_QsPozbhIV7hD93AMCDnutSQi6EaP" 
+                                     onerror="this.onerror=null; this.src='https://drive.google.com/uc?export=view&id=1tma_QsPozbhIV7hD93AMCDnutSQi6EaP';"
+                                     alt="Visual Tanda Tangan" 
+                                     class="max-h-20 max-w-full object-contain">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 text-xs text-center font-medium">
+        <div class="max-w-4xl mx-auto px-4">
+            <p>© Copyright 2026 Auraphone Systems, All Right Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        // Toast Notification Helper
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = message;
+            if (isError) {
+                toastIcon.className = "fa-solid fa-triangle-exclamation text-rose-400 text-lg";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-lg";
+            }
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+
+        // Protection Layer: Anti-Inspect & Disable Developer Tools
+        function initCodeProtection() {
+            // Block Context Menu (Klik Kanan)
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                showToast("Akses Klik Kanan Dibatasi", true);
+            });
+
+            // Block Key Combinations for DevTools / Inspect
+            document.addEventListener('keydown', function(e) {
+                // F12 Key
+                if (e.key === 'F12' || e.keyCode === 123) {
+                    e.preventDefault();
+                    showToast("Inspeksi Kode Dibatasi", true);
+                    return false;
+                }
+
+                // Ctrl+Shift+I / J / C (Windows/Linux) or Cmd+Opt+I / J / C (Mac)
+                const isInspectShortcut = (e.ctrlKey || e.metaKey) && e.shiftKey && 
+                    (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c');
+
+                if (isInspectShortcut) {
+                    e.preventDefault();
+                    showToast("Inspeksi Elemen Dibatasi", true);
+                    return false;
+                }
+
+                // Ctrl+U / Cmd+U (View Page Source)
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u')) {
+                    e.preventDefault();
+                    showToast("Kode Sumber Dibatasi", true);
+                    return false;
+                }
+
+                // Ctrl+S / Cmd+S (Save Page)
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'S' || e.key === 's')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        }
+
+        function checkUrlForVerificationPayload() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const docDataParam = urlParams.get('doc');
+
+            if (docDataParam) {
+                try {
+                    const decodedJson = atob(decodeURIComponent(docDataParam));
+                    const data = JSON.parse(decodedJson);
+
+                    if (data.t) document.getElementById('view-doc-title').innerText = data.t;
+                    if (data.n) document.getElementById('view-doc-num').innerText = data.n;
+                    if (data.d) document.getElementById('view-doc-date').innerText = formatDateIndonesian(data.d);
+                    if (data.o) document.getElementById('view-doc-org').innerText = data.o;
+                    if (data.s) document.getElementById('view-signee-name').innerText = data.s;
+                    if (data.r) document.getElementById('view-signee-role').innerText = data.r;
+
+                    if (data.img) {
+                        document.getElementById('view-signature-img').src = data.img;
+                    }
+
+                } catch (err) {
+                    console.error("Gagal membaca payload dokumen:", err);
+                    showToast("Kode QR tidak valid, menampilkan dokumen default.", true);
+                }
+            }
+        }
+
+        function formatDateIndonesian(dateString) {
+            if (!dateString) return '-';
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
+        }
+
+        window.onload = function() {
+            initCodeProtection();
+            checkUrlForVerificationPayload();
+        };
+    </script>
+</body>
+</html>
